@@ -1,0 +1,2 @@
+module DetectorHelper
+end

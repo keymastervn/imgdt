@@ -1,0 +1,138 @@
+<style type="text/css">
+  #main {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f9f9f9;
+  }
+  .container {
+    display: flex;
+    max-width: 80%;
+    margin: auto;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    border: 1px solid #ddd;
+    background: white;
+    overflow: hidden;
+    border-radius: 8px;
+  }
+  .left-column, .right-column {
+    padding: 20px;
+    flex: 1;
+  }
+  .left-column {
+    background-color: #f7f7f7;
+    border-right: 1px solid #ddd;
+  }
+  .right-column {
+    text-align: center;
+  }
+  .right-column img {
+    max-width: 100%;
+    height: auto;
+    display: none;
+    margin: 20px 0;
+  }
+  .stats {
+    margin-top: 20px;
+    font-size: 14px;
+    color: #333;
+  }
+  input[type="text"] {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  input[type="submit"] {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  input[type="submit"]:hover {
+    background-color: #0056b3;
+  }
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const imageUrlInput = document.getElementById("image_url");
+    const imageDisplay = document.getElementById("image_display");
+    const statsDiv = document.getElementById("stats");
+
+    document.getElementById("image_form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const url = imageUrlInput.value.trim();
+
+      if (url) {
+        const params = new URLSearchParams({
+          url: url
+        });
+
+        var stats = {};
+
+        await fetch(`/detect?${params}`, {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json"
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          stats = data;
+        })
+        .catch(error => console.error("Error loading places:", error));
+
+        imageDisplay.src = url;
+        imageDisplay.onload = () => {
+          if (stats.white_over_transparent_ratio > 0.9) {
+            imageDisplay.style.backgroundColor = '#000';
+          } else {
+            imageDisplay.style.backgroundColor = 'transparent';
+          }
+          imageDisplay.style.display = "block";
+          statsDiv.innerHTML = `<strong>Stats:</strong> <br> White Ratio: Calculating...`;
+
+          // Replace this with AJAX call if stats depend on the backend
+          setTimeout(() => {
+            statsDiv.innerHTML = `<strong>Stats:</strong> <br> Total pixels: ${stats.total_pixels} <br> Visible pixels: ${stats.visible_pixels} <br> Transparent pixels: ${stats.transparent_pixels} <br> White pixels: ${stats.white_pixels} (RGB>250) <br> Black pixels: ${stats.black_pixels} (RGB<5) <br> <br> <br>white_over_total_ratio: ${stats.white_over_total_ratio} (Note: >0.90 so BG should be black) <br> white_over_transparent_ratio: ${stats.white_over_transparent_ratio} <br> white_over_black_ratio: ${stats.white_over_black_ratio} <br> black_over_white_ratio: ${stats.black_over_white_ratio}`;
+          }, 500);
+        };
+        imageDisplay.onerror = () => {
+          imageDisplay.style.display = "none";
+          statsDiv.innerHTML = `<strong>Error:</strong> Invalid Image URL`;
+        };
+      } else {
+        imageDisplay.style.display = "none";
+        statsDiv.innerHTML = `<strong>Error:</strong> Please provide a valid URL.`;
+      }
+    });
+  });
+</script>
+
+<div id="main">
+  <div class="container">
+    <!-- Left Column -->
+    <div class="left-column">
+      <h2>Image Detector</h2>
+      <form id="image_form">
+        <input type="text" id="image_url" placeholder="Enter Image URL" />
+        <br />
+        <input type="submit" value="Submit" />
+      </form>
+    </div>
+
+    <!-- Right Column -->
+    <div class="right-column">
+      <img id="image_display" alt="Your selected image" />
+      <div class="stats" id="stats"></div>
+    </div>
+  </div>
+</div>
