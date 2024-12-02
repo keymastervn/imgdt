@@ -64,7 +64,7 @@ class DetectorController < ApplicationController
         white_over_total_ratio: white_pixels.to_f / total_pixels,
         white_over_transparent_ratio: white_pixels.to_f / transparent_pixels,
         white_over_black_ratio: white_pixels.to_f / black_pixels,
-        black_over_white_ratio: white_pixels.to_f / black_pixels
+        black_over_white_ratio: black_pixels.to_f / white_pixels
       }
     ensure
       image.destroy!
