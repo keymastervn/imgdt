@@ -92,7 +92,7 @@
 
         imageDisplay.src = url;
         imageDisplay.onload = () => {
-          if (stats.white_over_transparent_ratio > 0.9) {
+          if (stats.transparent_pixels > 0 && stats.black_pixels == 0 && stats.white_pixels == stats.visible_pixels) {
             imageDisplay.style.backgroundColor = '#000';
           } else {
             imageDisplay.style.backgroundColor = 'transparent';
@@ -102,7 +102,7 @@
 
           // Replace this with AJAX call if stats depend on the backend
           setTimeout(() => {
-            statsDiv.innerHTML = `<strong>Stats:</strong> <br> Total pixels: ${stats.total_pixels} <br> Visible pixels: ${stats.visible_pixels} <br> Transparent pixels: ${stats.transparent_pixels} <br> White pixels: ${stats.white_pixels} (RGB>250) <br> Black pixels: ${stats.black_pixels} (RGB<5) <br> <br> <br>white_over_total_ratio: ${stats.white_over_total_ratio} (Note: >0.90 so BG should be black) <br> white_over_transparent_ratio: ${stats.white_over_transparent_ratio} <br> white_over_black_ratio: ${stats.white_over_black_ratio} <br> black_over_white_ratio: ${stats.black_over_white_ratio}`;
+            statsDiv.innerHTML = `<strong>Stats:</strong> <br> Total pixels: ${stats.total_pixels} <br> Visible pixels: ${stats.visible_pixels} <br> Transparent pixels: ${stats.transparent_pixels} <br> White pixels: ${stats.white_pixels} (RGB>250) <br> Black pixels: ${stats.black_pixels} (RGB<5) <br> <br> <br>white_over_total_ratio: ${stats.white_over_total_ratio} <br> white_over_visible_ratio: ${stats.white_pixels / stats.visible_pixels} <br> white_over_transparent_ratio: ${stats.white_over_transparent_ratio} <br> white_over_black_ratio: ${stats.white_over_black_ratio} <br> black_over_white_ratio: ${stats.black_over_white_ratio}`;
           }, 500);
         };
         imageDisplay.onerror = () => {
